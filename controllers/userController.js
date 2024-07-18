@@ -1,11 +1,10 @@
-
-const users = [
-    {id:1, name: 'John', age: 25 },
-    { id:2,name: 'Jane', age: 30 },
-    { id:3,name: 'Bob', age: 35 }
-];
+const User=require("../models/userModels");
  const getAllUsers = async (req, res) => {
     try {
+        const users = await User.find();
+        if (!users) {
+            return res.status(404).json({ message: 'User not found' });
+        }
         res.status(200).json(users);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -13,11 +12,11 @@ const users = [
 }
  const getUserById = async (req, res) => {
     try {
-        const user = users.find(user => user.id === parseInt(req.params.id));
-        if (!user) {
+        const users = await User.find({ _id: req.params.id });
+        if (!users) {
             return res.status(404).json({ message: 'User not found' });
         }
-        res.status(200).json(user);
+        res.status(200).json(users);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -27,13 +26,11 @@ const createUser = async (req, res) => {
      /*   if (!req.body || !req.body.name || !req.body.age) {
             return res.status(400).json({ message: 'Invalid request body' });
         }*/
-        console.log(req.body);
-        const newUser = {
-            id: users.length + 1,
+        const newUser = new User({
             name: req.body.name,
             age: req.body.age
-        };
-        users.push(newUser);
+        });
+        await newUser.save();
         res.status(200).json({ message: 'User created successfully' });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -41,12 +38,13 @@ const createUser = async (req, res) => {
 }
  const updateUser = async (req, res) => {
     try {
-        const user = users.find(user => user.id === parseInt(req.params.id));
+        const user = await User.findById(req.params.id);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
         user.name = req.body.name;
         user.age = req.body.age;
+        await user.save();
         res.status(200).json({ message: 'User updated successfully' });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -54,12 +52,11 @@ const createUser = async (req, res) => {
 }
  const deleteUser = async (req, res) => {
     try {
-        const user = users.find(user => user.id === parseInt(req.params.id));
+        const user = await User.findById(req.params.id);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-        const index = users.indexOf(user);
-        users.splice(index, 1);
+        await user.deleteOne();
         res.status(200).json({ message: 'User deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: error.message });

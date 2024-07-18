@@ -1,0 +1,6 @@
+node_modules
+.env
+files
+certs
+.git
+.DS_Store

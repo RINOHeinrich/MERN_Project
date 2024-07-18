@@ -21,7 +21,7 @@ router.post('/', (req, res) => {
 // Update
 router.put('/:id', (req, res) => {
   // Code to update a user by ID
-    userController.UpdateUser(req, res);
+    userController.updateUser(req, res);
 });
 
 // Delete
